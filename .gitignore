@@ -1,18 +1,17 @@
-# goland
-.idea/
 # possible zone files
-*.txt
-*.com
-*.signed
+**/*.txt
+**/*.com
+**/*.signed
 # binary
 dns-tools
+**/*.out
 # scripts that should not be here
-*.sh
+**/*.sh
 # shared objects that should not be here
 *.so
 # Databases
-*sqlite3
-*.db
-*.pem
+**/*sqlite3
+**/*.db
+**/*.pem
 .vscode
 dns-tools-config.json
