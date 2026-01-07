@@ -1,7 +1,9 @@
 # DNS Tools: DNS signer (using PKCS11 and files) and ZONEMD digest calculator
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/niclabs/dns-tools)](https://goreportcard.com/report/github.com/niclabs/dns-tools) [![Build Status](https://travis-ci.org/niclabs/dns-tools.svg?branch=master)](https://travis-ci.org/niclabs/dns-tools)
+## About this version
+This is a port/partial rewrite of `dns-tools` into C++11 for backwards compatibility and hopefully better performance
 
+## Original Foreword
 (originally written by Hugo Salgado at [this blog post (in Spanish)](https://blog.nic.cl/2021/04/dns-tools-herramienta-para-verificar.html))
 
 Currently there are several solutions that allow automating the DNSSEC
@@ -125,32 +127,7 @@ something is missing or want to collaborate with any correction, please
 enter your "issues" to the github and we will improve it together!
 
 ## How to build dns-tools
-
-The following libraries should be installed in the systems which are going to use the compiled library:
-
-- git
-- gcc
-- Go (1.12.3 or higher)
-
-On [Debian 10 (Buster)](https://www.debian.org), with a sudo-enabled user, the commands to run to install dependencies and
-build are the following:
-
-```bash
-# Install requirements
-sudo apt install build-essential pkg-config git
-```
-
-To compile it, you need to have `Go` installed on your machine. You can find how to install Go on [its official page](https://golang.org/doc/install).
-
-Then, you need to clone, execute and build the repository:
-
-```
-git clone https://github.com/niclabs/dns-tools
-cd dns-tools
-go build
-```
-
-The file `dns-tools` will be created on the same directory.
+\[TODO\]
 
 ## Command Flags
 
@@ -286,29 +263,28 @@ Examples:
 
 ## Features
 
-- [x] Read zone
-- [x] Parse zone
-- [x] Create keys in HSM
-- [x] Sign using PKCS11 (for HSMs):
-  - [x] RSA
-  - [x] ECDSA
+- [ ] Read zone
+- [ ] Parse zone
+- [ ] Create keys in HSM
+- [ ] Sign using PKCS11 (for HSMs):
+  - [ ] RSA
+  - [ ] ECDSA
   - [ ] SHA-1
   - [ ] SHA128
-  - [x] SHA256
+  - [ ] SHA256
   - [ ] SHA512
-- [x] Sign using PKCS#8-encoded PEM keys:
-  - [x] RSA
-  - [x] ECDSA
+- [ ] Sign using PKCS#8-encoded PEM keys:
+  - [ ] RSA
+  - [ ] ECDSA
   - [ ] SHA-1
   - [ ] SHA128
-  - [x] SHA256
+  - [ ] SHA256
   - [ ] SHA512
-- [x] Calculate ZONEMD RRs
-- [x] Verify signed/digested zones
-- [x] Reuse keys
-- [x] Delete keys
-- [x] Save zone to file
+- [ ] Calculate ZONEMD RRs
+- [ ] Verify signed/digested zones
+- [ ] Reuse keys
+- [ ] Delete keys
+- [ ] Save zone to file
 
 ## Bugs
-
-- ~[Some incompatibilities with some common PKCS11-enabled libraries](https://github.com/niclabs/dns-tools/issues/8)~
+- None (known)
