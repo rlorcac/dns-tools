@@ -2,6 +2,7 @@
 **/*.txt
 **/*.com
 **/*.signed
+!CMakeLists.txt
 # binary
 dns-tools
 **/*.out
@@ -15,3 +16,4 @@ dns-tools
 **/*.pem
 .vscode
 dns-tools-config.json
+build/*
