@@ -5,6 +5,7 @@
 
 int main(int argc, char* argv[]){
     CLI::App dns_tools{"Allows signing of a DNS zone using a PKCS#11 device.\n\nFor more information, visit \"https://github.com/niclabs/dns-tools\"."};
+    dns_tools.fallthrough(true);
     CLI::App *sign_cmd = register_sign(dns_tools);
     CLI::App *verify_cmd = register_verify(dns_tools);
 
