@@ -1,5 +1,4 @@
 #include <iostream>
-#include <unordered_set>
 #include <string>
 #include <ctime>
 #include <cstdint>
@@ -19,7 +18,24 @@ struct DigestOptions {
     std::string zone;
 };
 
+struct SignFileOptions {
+    // sign file command options
+    std::string kskFile;
+    std::string zskFile;
+};
+
+struct SignPKCS11Options {
+    // sign pkcs11 command options
+    std::string keyLabel = "HSM-tools";
+    std::string p11lib;
+    std::string userKey = "1234";
+};
+
 struct SignOptions {
+    // file signing options
+    SignFileOptions fileOptions;
+    // pkcs11 signing options
+    SignPKCS11Options pkcs11Options;
     // sign command options
     bool createKeys = false;
     bool digest = false;
@@ -37,6 +53,7 @@ struct SignOptions {
     std::string verifyThresholdDate;
     std::string verifyThresholdDuration;
     std::string zone;
+    std::string output;
 };
 
 struct VerifyOptions {
