@@ -13,9 +13,6 @@ enum : DigestAlgorithm {
     SHA512 = 2,
 };
 
-std::unordered_map<std::string, DigestAlgorithm> stringToDigestAlgorithm = {
-    {"sha384", SHA384},
-    {"sha512", SHA512},
-};
+extern std::unordered_map<std::string, DigestAlgorithm> stringToDigestAlgorithm;
 
 #endif // CRYPTO_DIGEST_HPP

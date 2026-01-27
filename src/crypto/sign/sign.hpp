@@ -12,12 +12,6 @@ enum : SignAlgorithm {
     ECDSAP256SHA256 = 13,
 };
 
-std::unordered_map<std::string, SignAlgorithm> stringToSignAlgorithm = {
-    {"rsa", RSASHA256},
-    {"rsasha256", RSASHA256},
-    {"ecdsa", ECDSAP256SHA256},
-    {"ecdsa_p256", ECDSAP256SHA256},
-    {"ecdsa_p256_sha256", ECDSAP256SHA256}
-};
+extern std::unordered_map<std::string, SignAlgorithm> stringToSignAlgorithm;
 
 #endif // CRYPTO_SIGN_HPP

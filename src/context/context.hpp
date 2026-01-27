@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <cstdint>
+#include <memory>
 
 #ifndef CONTEXT_HPP // CONTEXT_HPP
 #define CONTEXT_HPP
@@ -77,7 +78,7 @@ struct AllOptions {
     // verify command options
     VerifyOptions verify;
 };
-
-std::shared_ptr<AllOptions> OPTION_STRUCT = std::make_shared<AllOptions>();
+    
+extern std::shared_ptr<AllOptions> OPTION_STRUCT;
 
 #endif // CONTEXT_HPP
