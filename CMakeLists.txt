@@ -37,6 +37,10 @@ find_package(OpenSSL REQUIRED)
             src/cli/sign/sign_command.cpp
             src/cli/verify/verify_command.cpp
             src/cli/digest/digest_command.cpp
+            src/context/context.cpp
+            src/crypto/hash/digest.cpp
+            src/crypto/sign/sign.cpp
+            src/crypto/verify/verify.cpp
     )
 
     target_include_directories(
