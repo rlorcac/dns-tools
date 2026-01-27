@@ -7,16 +7,31 @@
 
 CLI::App *register_sign_file(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("file", "uses keys from a file to sign the zone");
+    
+    sc->add_option("-K,--ksk-file", OPTION_STRUCT->sign.fileOptions.kskFile, 
+        "Full path to KSK key file.");
+    sc->add_option("-Z,--zsk-file", OPTION_STRUCT->sign.fileOptions.zskFile, 
+        "Full path to ZSK key file.");
+    
     return sc;
 }
 
 CLI::App *register_sign_pkcs11(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("pkcs11", "uses keys from a PKCS#11 library to sign the zone");
+    
+    sc->add_option("-l,--key-label", OPTION_STRUCT->sign.pkcs11Options.keyLabel, 
+        "Label of HSM Signer PKCS11 Key. (default: HSM-tools)");
+    sc->add_option("-p,--p11lib", OPTION_STRUCT->sign.pkcs11Options.p11lib, 
+        "Full path to PKCS11 lib file.");
+    sc->add_option("-u,--user-key", OPTION_STRUCT->sign.pkcs11Options.userKey, 
+        "HSM User Login PKCS11Key. (default: 1234)");
+    
     return sc;
 }
 
 CLI::App *register_sign(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("sign", "Signs a DNS Zone using a PKCS#11 library or a file");
+    
     // boolean options
     sc->add_flag("-c,--create-keys", OPTION_STRUCT->sign.createKeys, 
         "Creates a new pair of keys, deleting all previously valid keys.");
@@ -63,6 +78,7 @@ CLI::App *register_sign(CLI::App &app) {
     sc->add_option("-Q,--hash-digest", OPTION_STRUCT->sign.hashDigest,
         "Hash algorithm for digest verification. Supported values are: sha384, sha512.")
          ->transform(CLI::Transformer(stringToDigestAlgorithm, CLI::ignore_case));
+    
     register_sign_file(*sc);
     register_sign_pkcs11(*sc);
 

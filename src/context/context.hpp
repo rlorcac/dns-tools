@@ -20,8 +20,8 @@ struct DigestOptions {
 
 struct SignFileOptions {
     // sign file command options
-    std::string kskFile;
-    std::string zskFile;
+    std::string kskFile = "ksk.pem";
+    std::string zskFile = "zsk.pem";
 };
 
 struct SignPKCS11Options {
