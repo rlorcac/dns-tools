@@ -1,5 +1,10 @@
+#include <unordered_map>
+#include <string>
+#include <cstdint>
+
 #ifndef CRYPTO_DIGEST_HPP // CRYPTO_DIGEST_HPP
 #define CRYPTO_DIGEST_HPP
+
 
 typedef uint8_t DigestAlgorithm;
 

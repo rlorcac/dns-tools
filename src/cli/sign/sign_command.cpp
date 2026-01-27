@@ -6,11 +6,13 @@
 
 CLI::App *register_sign_file(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("file", "uses keys from a file to sign the zone");
+    sc->fallthrough(true);
     return sc;
 }
 
 CLI::App *register_sign_pkcs11(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("pkcs11", "uses keys from a PKCS#11 library to sign the zone");
+    sc->fallthrough(true);
     return sc;
 }
 
@@ -27,12 +29,15 @@ CLI::App *register_sign(CLI::App &app) {
     CLI::Option *option_nsec3 = sc->add_flag("-3,--nsec3", OPTION_STRUCT->sign.NSEC3, "Use NSEC3 instead of NSEC");
     sc->add_flag("-x,--opt-out", OPTION_STRUCT->sign.optOut, "Use NSEC3 with opt-out.");
     // string options
-    {
-        sc->add_option("--file", OPTION_STRUCT->sign.file, "Full path to the zone file to be signed.");
-        sc->add_option("--nsec3-salt-value", OPTION_STRUCT->sign.NSEC3SaltValue, "Salt value to be used for NSEC3 records, in hexadecimal format.")
+    sc->add_option("--file", OPTION_STRUCT->sign.file, "Full path to the zone file to be signed.");
+    sc->add_option("-a,--sign-algorithm", OPTION_STRUCT->sign.signAlgorithm, "Signing algorithm to be used. Supported values are: rsa, ecdsa.")
+        ->transform(CLI::CheckedTransformer(stringToSignAlgorithm, CLI::ignore_case));
+    CLI::Option *option_nsec3_salt_length = sc->add_option("--nsec3-salt-length", OPTION_STRUCT->sign.NSEC3SaltLength, "Length of the salt to be used for NSEC3 hashing. If --nsec3-salt-value is not provided, a random salt of this length will be generated.")
         ->needs(option_nsec3);
-    }
-
+    sc->add_option("--nsec3-salt-value", OPTION_STRUCT->sign.NSEC3SaltValue, "Salt value to be used for NSEC3 hashing, in hexadecimal format.")
+        ->needs(option_nsec3)->excludes(option_nsec3_salt_length);
+    sc->add_option("--nsec3-iterations", OPTION_STRUCT->sign.NSEC3Iterations, "Number of iterations to be used for NSEC3 hashing.")
+        ->needs(option_nsec3);
     register_sign_file(*sc);
     register_sign_pkcs11(*sc);
 

@@ -28,7 +28,7 @@ struct SignOptions {
     bool lazy = false;
     bool NSEC3 = false;
     uint16_t NSEC3Iterations;
-    uint16_t NSEC3SaltLength;
+    uint16_t NSEC3SaltLength = 64;
     std::string NSEC3SaltValue;
     bool optOut = false;
     std::string rrsigDuration;
