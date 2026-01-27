@@ -6,7 +6,7 @@
 #define CRYPTO_DIGEST_HPP
 
 
-typedef uint8_t DigestAlgorithm;
+typedef int DigestAlgorithm;
 
 enum : DigestAlgorithm {
     SHA384 = 1,

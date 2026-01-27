@@ -19,7 +19,6 @@ CLI::App *register_sign_pkcs11(CLI::App &app) {
 CLI::App *register_sign(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("sign", "Signs a DNS Zone using a PKCS#11 library or a file");
     sc->fallthrough(true);
-
     // boolean options
     sc->add_flag("-c,--create-keys", OPTION_STRUCT->sign.createKeys, 
         "Creates a new pair of keys, deleting all previously valid keys.");

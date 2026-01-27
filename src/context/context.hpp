@@ -12,7 +12,7 @@
 struct DigestOptions {
     // digest command options
     std::string file;
-    DigestAlgorithm hashDigest = SHA384;
+    std::string hashDigest = "sha384";
     bool info = false;
     std::string output;
     std::string zone;
@@ -40,7 +40,7 @@ struct SignOptions {
     bool createKeys = false;
     bool digest = false;
     std::string file;
-    DigestAlgorithm hashDigest = SHA384;
+    std::string hashDigest = "sha384";
     bool lazy = false;
     bool NSEC3 = false;
     uint16_t NSEC3Iterations;
@@ -49,7 +49,7 @@ struct SignOptions {
     bool optOut = false;
     std::string rrsigDuration;
     std::string rrsigExpirationDate;
-    SignAlgorithm signAlgorithm = RSASHA256;
+    std::string signAlgorithm = "rsa";
     std::string verifyThresholdDate;
     std::string verifyThresholdDuration;
     std::string zone;

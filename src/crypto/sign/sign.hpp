@@ -5,7 +5,7 @@
 #ifndef CRYPTO_SIGN_HPP // CRYPTO_SIGN_HPP
 #define CRYPTO_SIGN_HPP
 
-typedef uint8_t SignAlgorithm;
+typedef int SignAlgorithm;
 
 enum : SignAlgorithm {
     RSASHA256 = 8,
