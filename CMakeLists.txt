@@ -50,7 +50,7 @@ find_package(OpenSSL REQUIRED)
     target_link_libraries(
         dns-tools-cli
             PRIVATE
-                dns-tools-crypto
+                # dns-tools-crypto
                 CLI11::CLI11
     )
 
@@ -61,7 +61,7 @@ target_link_libraries(
     dns-tools
     PRIVATE
         dns-tools-cli
-        dns-tools-crypto
+        # dns-tools-crypto
 )
 
 target_include_directories(
