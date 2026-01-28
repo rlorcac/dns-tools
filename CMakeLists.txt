@@ -52,6 +52,7 @@ find_package(OpenSSL REQUIRED)
             src/dns/wire_format.cpp
             src/dns/zone_parser.cpp
             src/dns/rrset.cpp
+            src/dns/nsec.cpp
     )
 
     target_include_directories(
