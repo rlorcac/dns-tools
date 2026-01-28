@@ -46,9 +46,7 @@ namespace dns {
             std::string line;
             while (std::getline(file, line)) {
                 cleanupLine(line);
-                
                 if (line.empty()) continue;
-                
                 // Check for $TTL directive
                 if (line[0] == '$') {
                     std::istringstream iss(line);
@@ -57,7 +55,7 @@ namespace dns {
                     if (directive == "$ORIGIN" && !origin_initialized) {
                         std::string __origin;
                         iss >> __origin;
-                        if (__origin.back() != '.') {
+                        if (!__origin.empty() && __origin.back() != '.') {
                             throw std::runtime_error("Origin must be a fully qualified domain name");
                         }
                         else {
@@ -250,8 +248,9 @@ namespace dns {
                 if (token == "@") {
                     rr.name = origin;
                 } else {
+                    token = toLower(token);
                     rr.name = token;
-                    if (rr.name.back() != '.') {
+                    if (!rr.name.empty() && rr.name.back() != '.') {
                         rr.name += "." + origin;
                     }
                 }
@@ -275,15 +274,14 @@ namespace dns {
                 
                 // Class
                 iss >> token; // IN expected
-                rr.rclass = parseClass(token);
             }  else {
                 // Token is CLASS, use default TTL
                 if (!default_ttl_initialized) {
                     throw std::runtime_error("Default TTL not set for record without explicit TTL");
                 }
                 rr.ttl = default_ttl;
-                rr.rclass = parseClass(token);
             }
+                rr.rclass = parseClass(token);
             
             // Type
             iss >> token;
@@ -308,7 +306,7 @@ namespace dns {
                 case RR_TYPE_NS: case RR_TYPE_CNAME: {
                     std::string name;
                     iss >> name;
-                    if (name.back() != '.') name += "." + origin;
+                    if (!name.empty() && name.back() != '.') name += "." + origin;
                     rdata = encodeName(name);
                     break;
                 }
@@ -317,8 +315,8 @@ namespace dns {
                     uint32_t serial, refresh, retry, expire, minimum;
                     iss >> mname >> rname >> serial >> refresh >> retry >> expire >> minimum;
                     
-                    if (mname.back() != '.') mname += "." + origin;
-                    if (rname.back() != '.') rname += "." + origin;
+                    if (!mname.empty() && mname.back() != '.') mname += "." + origin;
+                    if (!rname.empty() && rname.back() != '.') rname += "." + origin;
                     
                     auto mname_enc = encodeName(mname);
                     auto rname_enc = encodeName(rname);
@@ -335,7 +333,7 @@ namespace dns {
                 case RR_TYPE_MX: {
                     std::string pref, exchange;
                     iss >> pref >> exchange;
-                    if (exchange.back() != '.') exchange += "." + origin;
+                    if (!exchange.empty() && exchange.back() != '.') exchange += "." + origin;
                     
                     writeUint16(rdata, std::stoi(pref));
                     auto exch = encodeName(exchange);
@@ -346,8 +344,13 @@ namespace dns {
                     std::string txt;
                     std::getline(iss, txt);
                     // Remove quotes
-                    txt.erase(0, txt.find_first_not_of(" \t\""));
-                    txt.erase(txt.find_last_not_of(" \t\"") + 1);
+                    size_t first = txt.find_first_not_of(" \t\"");
+                    size_t last = txt.find_last_not_of(" \t\"");
+                    if (first != std::string::npos && last != std::string::npos) {
+                        txt = txt.substr(first, last - first + 1);
+                    } else {
+                        txt.clear();
+                    }
                     
                     rdata.push_back(txt.length());
                     rdata.insert(rdata.end(), txt.begin(), txt.end());
@@ -412,7 +415,7 @@ namespace dns {
                     writeUint16(rdata, std::stoi(key_tag));
                     
                     // Signer's name
-                    if (signer.back() != '.') signer += "." + origin;
+                    if (!signer.empty() && signer.back() != '.') signer += "." + origin;
                     auto signer_enc = encodeName(signer);
                     rdata.insert(rdata.end(), signer_enc.begin(), signer_enc.end());
                     
@@ -432,7 +435,7 @@ namespace dns {
                     std::string next_name;
                     iss >> next_name;
                     
-                    if (next_name.back() != '.') next_name += "." + origin;
+                    if (!next_name.empty() && next_name.back() != '.') next_name += "." + origin;
                     auto next_enc = encodeName(next_name);
                     rdata.insert(rdata.end(), next_enc.begin(), next_enc.end());
                     
@@ -541,66 +544,61 @@ namespace dns {
     }
         // Encode type bitmap for NSEC
         std::vector<uint8_t> encodeTypeBitmap(const std::vector<uint16_t>& types) {
-        if (types.empty()) return {};
-        
-        // Group types into windows (256 types per window)
-        std::map<uint8_t, std::set<uint8_t>> windows;
-        
-        for (uint16_t type : types) {
-            uint8_t window = type / 256;
-            uint8_t bit = type % 256;
-            windows[window].insert(bit);
-        }
-        
-        std::vector<uint8_t> bitmap;
-        for (const auto& pair : windows) {
-            uint8_t window_num = pair.first;
-            const auto& bits = pair.second;
-            if (bits.empty()) continue;
+            if (types.empty()) return {};
             
-            // Find highest bit
-            uint8_t max_bit = *bits.rbegin();
-            uint8_t bitmap_len = (max_bit / 8) + 1;
+            // Group types into windows (256 types per window)
+            std::map<uint8_t, std::set<uint8_t>> windows;
             
-            bitmap.push_back(window_num);
-            bitmap.push_back(bitmap_len);
-            
-            std::vector<uint8_t> window_bitmap(bitmap_len, 0);
-            for (uint8_t bit : bits) {
-                uint8_t byte_pos = bit / 8;
-                uint8_t bit_pos = 7 - (bit % 8);
-                window_bitmap[byte_pos] |= (1 << bit_pos);
+            for (uint16_t type : types) {
+                uint8_t window = type / 256;
+                uint8_t bit = type % 256;
+                windows[window].insert(bit);
             }
             
-            bitmap.insert(bitmap.end(), window_bitmap.begin(), window_bitmap.end());
+            std::vector<uint8_t> bitmap;
+            for (const auto& pair : windows) {
+                uint8_t window_num = pair.first;
+                const auto& bits = pair.second;
+                if (bits.empty()) continue;
+                
+                // Find highest bit
+                uint8_t max_bit = *bits.rbegin();
+                uint8_t bitmap_len = (max_bit / 8) + 1;
+                
+                bitmap.push_back(window_num);
+                bitmap.push_back(bitmap_len);
+                
+                std::vector<uint8_t> window_bitmap(bitmap_len, 0);
+                for (uint8_t bit : bits) {
+                    uint8_t byte_pos = bit / 8;
+                    uint8_t bit_pos = 7 - (bit % 8);
+                    window_bitmap[byte_pos] |= (1 << bit_pos);
+                }
+                
+                bitmap.insert(bitmap.end(), window_bitmap.begin(), window_bitmap.end());
+            }
+            
+            return bitmap;
         }
-        
-        return bitmap;
-    }
 
-        rr_type_t parseType(const std::string& type_str) {            
-            auto it = str_to_rr_type_t.find(type_str);
+        rr_type_t parseType(std::string& type_str) {
+            std::string copy = toUpper(type_str);     
+            auto it = str_to_rr_type_t.find(copy);
             if (it != str_to_rr_type_t.end()) {
                 return it->second;
             } else {
-                throw std::runtime_error("Unknown RR type: " + type_str);
+                throw std::runtime_error("Unknown RR type: " + copy);
             }
         }
     
-        rr_class_t parseClass(const std::string& class_str) {
-            static std::unordered_map<std::string, rr_class_t> class_map = {
-                {"IN", RR_CLASS_IN},
-                {"CH", RR_CLASS_CH},
-                {"HS", RR_CLASS_HS},
-                {"NONE", RR_CLASS_NONE},
-                {"ANY", RR_CLASS_ANY}
-            };
+        rr_class_t parseClass(std::string& class_str) {
+            std::string copy = toUpper(class_str);
             
-            auto it = class_map.find(class_str);
-            if (it != class_map.end()) {
+            auto it = str_to_rr_class_t.find(copy);
+            if (it != str_to_rr_class_t.end()) {
                 return it->second;
             } else {
-                throw std::runtime_error("Unknown RR class: " + class_str);
+                throw std::runtime_error("Unknown RR class: " + copy);
             }
         }
     };

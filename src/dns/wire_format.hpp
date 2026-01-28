@@ -23,7 +23,9 @@ uint32_t readUint32(const uint8_t* buf, size_t& offset);
 // DNS name encoding
 std::vector<uint8_t> encodeName(const std::string& name);
 
-std::string toLower(std::string s);
+std::string toLower(const std::string& s);
+
+std::string toUpper(const std::string& s);
 
 } // namespace dns
 

@@ -34,7 +34,7 @@ namespace dns {
                     DNSResourceRecord rr = parseRR(line);
                     records.push_back(rr);
                 } catch (const std::exception& e) {
-                    if (line[0] == '$') continue; // Skip directives
+                    if (!line.empty() && line[0] == '$') continue; // Skip directives
                     std::cerr << "Warning: Failed to parse line: " << line << "\n";
                     std::cerr << "\tError: " << e.what() << "\n";
                     continue; // Skip bad lines
