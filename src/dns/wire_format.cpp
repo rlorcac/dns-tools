@@ -8,29 +8,29 @@
 namespace dns {
 
 // Wire format helpers
-inline void writeUint8(std::vector<uint8_t>& buf, uint8_t val) {
+void writeUint8(std::vector<uint8_t>& buf, uint8_t val) {
     buf.push_back(val);
 }
 
-inline void writeUint16(std::vector<uint8_t>& buf, uint16_t val) {
+void writeUint16(std::vector<uint8_t>& buf, uint16_t val) {
     buf.push_back((val >> 8) & 0xFF);
     buf.push_back(val & 0xFF);
 }
 
-inline void writeUint32(std::vector<uint8_t>& buf, uint32_t val) {
+void writeUint32(std::vector<uint8_t>& buf, uint32_t val) {
     buf.push_back((val >> 24) & 0xFF);
     buf.push_back((val >> 16) & 0xFF);
     buf.push_back((val >> 8) & 0xFF);
     buf.push_back(val & 0xFF);
 }
 
-inline uint16_t readUint16(const uint8_t* buf, size_t& offset) {
+uint16_t readUint16(const uint8_t* buf, size_t& offset) {
     uint16_t val = (buf[offset] << 8) | buf[offset+1];
     offset += 2;
     return val;
 }
 
-inline uint32_t readUint32(const uint8_t* buf, size_t& offset) {
+uint32_t readUint32(const uint8_t* buf, size_t& offset) {
     uint32_t val = (buf[offset] << 24) | (buf[offset+1] << 16) |
                    (buf[offset+2] << 8) | buf[offset+3];
     offset += 4;
@@ -38,7 +38,7 @@ inline uint32_t readUint32(const uint8_t* buf, size_t& offset) {
 }
 
 // DNS name encoding
-inline std::vector<uint8_t> encodeName(const std::string& name) {
+std::vector<uint8_t> encodeName(const std::string& name) {
     std::vector<uint8_t> result;
     std::istringstream iss(name);
     std::string label;
@@ -53,7 +53,7 @@ inline std::vector<uint8_t> encodeName(const std::string& name) {
     return result;
 }
 
-inline std::string toLower(std::string s) {
+std::string toLower(std::string s) {
     for (auto& c : s) c = std::tolower(c);
     return s;
 }

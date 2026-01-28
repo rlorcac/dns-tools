@@ -33,6 +33,44 @@ find_package(OpenSSL REQUIRED)
                 OpenSSL::Crypto
     )
 
+# DNS library
+    add_library(
+        dns-tools-dns
+            src/dns/rr.cpp
+            src/dns/wire_format.cpp
+            src/dns/zone_parser.cpp
+    )
+
+    target_include_directories(
+        dns-tools-dns
+            PUBLIC
+                src/dns
+    )
+
+    target_link_libraries(
+        dns-tools-dns
+            PRIVATE
+                dns-tools-crypto
+    )
+
+# Context library
+    add_library(
+        dns-tools-context
+            src/context/context.cpp
+    )
+
+    target_include_directories(
+        dns-tools-context
+            PUBLIC
+                src/context
+    )
+
+    target_link_libraries(
+        dns-tools-context
+            PRIVATE
+                dns-tools-crypto
+    )
+
 # CLI library
     add_library(
         dns-tools-cli
@@ -51,13 +89,15 @@ find_package(OpenSSL REQUIRED)
                 src/cli
                 src/context
                 src/crypto
+                src/dns
     )
     
     target_link_libraries(
         dns-tools-cli
             PRIVATE
-                # dns-tools-crypto
                 CLI11::CLI11
+                dns-tools-crypto
+                dns-tools-dns
     )
 
 
@@ -67,7 +107,7 @@ target_link_libraries(
     dns-tools
     PRIVATE
         dns-tools-cli
-        # dns-tools-crypto
+        dns-tools-crypto
 )
 
 target_include_directories(

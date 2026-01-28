@@ -15,5 +15,37 @@ namespace dns {
             writeUint16(wire, rdata.size());
             wire.insert(wire.end(), rdata.begin(), rdata.end());
             return wire;
+    }    
+
+    std::ostream& operator<<(std::ostream& os, const rr_class_t& rclass) {
+        std::string class_str;
+        auto it = rr_class_t_to_str.find(rclass);
+        if (it != rr_class_t_to_str.end()) {
+            class_str = it->second;
+        } else {
+            class_str = "UNKNOWN(" + std::to_string(static_cast<uint16_t>(rclass)) + ")";
+        }
+        os << class_str;
+        return os;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const rr_type_t& rtype) {
+        std::string type_str;
+        auto it = rr_type_t_to_str.find(rtype);
+        if (it != rr_type_t_to_str.end()) {
+            type_str = it->second;
+        } else {
+            type_str = "UNKNOWN(" + std::to_string(static_cast<uint16_t>(rtype)) + ")";
+        }
+        os << type_str;
+        return os;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const DNSResourceRecord& rr) {
+        os << rr.name << "\t" << rr.ttl << "\t" << rr.rclass << "\t" << rr.type << "\t";
+        for (uint8_t byte : rr.rdata) {
+            os << std::hex << (int)byte;
+        }
+        return os;
     }
 }
