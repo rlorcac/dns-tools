@@ -10,7 +10,7 @@ CLI::App *register_digest(CLI::App &app) {
         "Full path to zone file.");
     sc->add_option("-d,--hash-digest", OPTION_STRUCT->digest.hashDigest,
         "Hash algorithm for digest computation. Supported values are: sha384, sha512.")
-        ->transform(CLI::CheckedTransformer(stringToDigestAlgorithm, CLI::ignore_case));
+        ->transform(CLI::Transformer(crypto::stringToDigestAlgorithm, CLI::ignore_case));
     sc->add_flag("-i,--info", OPTION_STRUCT->digest.info,
         "If true, a TXT RR is added with information about the digesting process (tool and mode).");
     sc->add_option("-o,--output", OPTION_STRUCT->digest.output,
