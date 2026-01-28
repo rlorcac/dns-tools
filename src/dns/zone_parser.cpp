@@ -42,9 +42,6 @@ namespace dns {
             }
             
             file.close();
-            for (const auto& rr : records) {
-                std::cout << rr << "\n";
-            }
             return records;
         }
     
