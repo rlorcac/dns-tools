@@ -23,6 +23,9 @@ namespace dns {
     private:
         std::ifstream file;
 
+        std::string last_owner_name = "";
+        bool last_owner_name_initialized = false;
+
         uint32_t default_ttl;
         bool default_ttl_initialized = false;
 
@@ -35,10 +38,6 @@ namespace dns {
             if (comment != std::string::npos) {
                 line = line.substr(0, comment);
             }
-            
-            // Trim
-            line.erase(0, line.find_first_not_of(" \t"));
-            line.erase(line.find_last_not_of(" \t\r\n") + 1);
         }
 
         void scanForDirectives(const std::string& filename) {
@@ -141,52 +140,63 @@ namespace dns {
 
         std::vector<uint8_t> parseIPv6(const std::string& ip) {
             std::vector<uint8_t> bytes;
-            std::istringstream iss(ip);
-            std::string segment;
-            int segments_count = 0;
             bool has_double_colon = false;
-            size_t double_colon_pos = std::string::npos;
-
-            // First pass to handle '::'
+            size_t double_colon_pos = 0;
+            
+            // Split by ':' and process
+            std::vector<std::string> segments;
             size_t pos = 0;
+            
             while (pos < ip.length()) {
                 if (ip[pos] == ':') {
                     if (pos + 1 < ip.length() && ip[pos + 1] == ':') {
                         if (has_double_colon) {
-                            throw std::runtime_error("Invalid IPv6 address: " + ip);
+                            throw std::runtime_error("Invalid IPv6 address: multiple '::'");
                         }
                         has_double_colon = true;
-                        double_colon_pos = segments_count;
+                        double_colon_pos = segments.size();
                         pos += 2;
                         continue;
                     }
+                    pos++;
+                    continue;
                 }
+                
                 size_t next_colon = ip.find(':', pos);
                 if (next_colon == std::string::npos) next_colon = ip.length();
-                segment = ip.substr(pos, next_colon - pos);
+                
+                std::string segment = ip.substr(pos, next_colon - pos);
                 if (!segment.empty()) {
-                    int val = std::stoi(segment, nullptr, 16);
-                    if (val < 0 || val > 0xFFFF) {
-                        throw std::runtime_error("Invalid IPv6 address: " + ip);
-                    }
-                    bytes.push_back(static_cast<uint8_t>((val >> 8) & 0xFF));
-                    bytes.push_back(static_cast<uint8_t>(val & 0xFF));
-                    segments_count++;
+                    segments.push_back(segment);
                 }
-                pos = next_colon + 1;
+                pos = next_colon;
             }
-
+            
+            // Convert segments to bytes
+            for (const auto& segment : segments) {
+                int val = std::stoi(segment, nullptr, 16);
+                if (val < 0 || val > 0xFFFF) {
+                    throw std::runtime_error("Invalid IPv6 segment: " + segment);
+                }
+                bytes.push_back(static_cast<uint8_t>((val >> 8) & 0xFF));
+                bytes.push_back(static_cast<uint8_t>(val & 0xFF));
+            }
+            
             // Handle '::' expansion
             if (has_double_colon) {
-                size_t missing_segments = 8 - segments_count;
+                int missing_segments = 8 - segments.size();
+                if (missing_segments < 0) {
+                    throw std::runtime_error("Invalid IPv6 address: too many segments");
+                }
                 size_t insert_pos = double_colon_pos * 2;
                 bytes.insert(bytes.begin() + insert_pos, missing_segments * 2, 0);
             }
-
+            
             if (bytes.size() != 16) {
+                std::cerr << "Bytes size: " << bytes.size() << " for IPv6: " << ip << "\n";
                 throw std::runtime_error("Invalid IPv6 address: " + ip);
             }
-
+            
             return bytes;
         }
 
@@ -224,17 +234,38 @@ namespace dns {
             DNSResourceRecord rr;
             
             std::string token;
+            // Check if line starts with whitespace (blank name field)
+            bool blank_name = !line.empty() && (line[0] == ' ' || line[0] == '\t');
             iss >> token;
             
             // Name
-            rr.name = token;
-            if (rr.name.back() != '.') {
-                rr.name += "." + origin;
+            if (blank_name) {
+                // Inherit from previous record
+                if (!last_owner_name_initialized) {
+                    throw std::runtime_error("Blank owner name with no previous record");
+                }
+                rr.name = last_owner_name;
+            } else {
+                // Parse the name
+                if (token == "@") {
+                    rr.name = origin;
+                } else {
+                    rr.name = token;
+                    if (rr.name.back() != '.') {
+                        rr.name += "." + origin;
+                    }
+                }
+                // Update last owner name
+                last_owner_name = rr.name;
+                last_owner_name_initialized = true;
             }
             
+            // If we used the name, get next token; otherwise token already has the next field
+            if (!blank_name) {
+                iss >> token;
+            }
             // Check if next token is TTL (numeric) or CLASS (IN/OUT/etc)
             size_t pos = iss.tellg();
-            iss >> token;
             
             bool token_is_numeric = !token.empty() && std::all_of(token.begin(), token.end(), ::isdigit);
             
@@ -245,7 +276,7 @@ namespace dns {
                 // Class
                 iss >> token; // IN expected
                 rr.rclass = parseClass(token);
-            } else {
+            }  else {
                 // Token is CLASS, use default TTL
                 if (!default_ttl_initialized) {
                     throw std::runtime_error("Default TTL not set for record without explicit TTL");

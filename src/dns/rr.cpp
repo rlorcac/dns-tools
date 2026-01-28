@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <iomanip>
 #include "rr.hpp"
 #include "wire_format.hpp"
 
@@ -44,7 +45,7 @@ namespace dns {
     std::ostream& operator<<(std::ostream& os, const DNSResourceRecord& rr) {
         os << rr.name << "\t" << std::dec << rr.ttl << "\t" << rr.rclass << "\t" << rr.type << "\t";
         for (uint8_t byte : rr.rdata) {
-            os << std::hex << (int)byte;
+            os << std::hex << std::setfill('0') << std::setw(2) << (int)byte;
         }
         return os;
     }
