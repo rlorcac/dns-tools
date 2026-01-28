@@ -22,7 +22,6 @@ int main(int argc, char* argv[]){
             CLI::FileOnDefaultPath("/etc/dns-tools/", false) 
             | CLI::FileOnDefaultPath("./", false)
         );
-    dns_tools.get_config_formatter_base()->valueSeparator(':');
 
     CLI11_PARSE(dns_tools, argc, argv);
 }

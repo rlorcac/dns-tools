@@ -14,9 +14,11 @@ find_package(CLI11 REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 # Crypto library
-#[[
     add_library(
         dns-tools-crypto
+            src/crypto/hash/digest.cpp
+            src/crypto/sign/sign.cpp
+            src/crypto/verify/verify.cpp
     )
 
     target_include_directories(
@@ -30,7 +32,7 @@ find_package(OpenSSL REQUIRED)
             PRIVATE
                 OpenSSL::Crypto
     )
-]]
+
 # CLI library
     add_library(
         dns-tools-cli
