@@ -7,7 +7,7 @@
 #include <algorithm>
 
 namespace dns {
-    DNSResourceRecordSetList groupIntoRRsets(const std::vector<DNSResourceRecord>& records) {
+    std::vector<DNSResourceRecordSet> groupIntoRRsets(const std::vector<DNSResourceRecord>& records) {
         std::map<std::tuple<std::string, uint16_t>, DNSResourceRecordSet> map;
         
         for (const auto& rr : records) {
@@ -25,7 +25,7 @@ namespace dns {
             map[key].records.push_back(rr);
         }
         
-        DNSResourceRecordSetList result;
+        std::vector<DNSResourceRecordSet> result;
         for (auto& pair : map) {
             // Sort RRset canonically
             std::sort(pair.second.records.begin(), pair.second.records.end(),

@@ -15,9 +15,7 @@ namespace dns {
         std::vector<DNSResourceRecord> records;
     };
 
-    typedef std::vector<DNSResourceRecordSet> DNSResourceRecordSetList;
-
-    DNSResourceRecordSetList groupIntoRRsets(const std::vector<DNSResourceRecord>& records);
+    std::vector<DNSResourceRecordSet> groupIntoRRsets(const std::vector<DNSResourceRecord>& records);
 
     std::vector<uint8_t> rrsetToWire(const DNSResourceRecordSet& rrset);
 }
