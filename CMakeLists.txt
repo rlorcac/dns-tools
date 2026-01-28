@@ -25,26 +25,6 @@ find_package(OpenSSL REQUIRED)
                 src/commons
     )
 
-# Crypto library
-    add_library(
-        dns-tools-crypto
-            src/crypto/hash/digest.cpp
-            src/crypto/sign/sign.cpp
-            src/crypto/verify/verify.cpp
-    )
-
-    target_include_directories(
-        dns-tools-crypto
-            PUBLIC
-                src/crypto
-    )
-
-    target_link_libraries(
-        dns-tools-crypto
-            PRIVATE
-                OpenSSL::Crypto
-    )
-
 # DNS library
     add_library(
         dns-tools-dns
@@ -65,8 +45,31 @@ find_package(OpenSSL REQUIRED)
     target_link_libraries(
         dns-tools-dns
             PRIVATE
-                dns-tools-crypto
                 dns-tools-commons
+    )
+
+# Crypto library
+    add_library(
+        dns-tools-crypto
+            src/crypto/hash/digest.cpp
+            src/crypto/sign/sign.cpp
+            src/crypto/verify/verify.cpp
+    )
+
+    target_include_directories(
+        dns-tools-crypto
+            PUBLIC
+                src/crypto
+                src/dns
+                src/commons
+    )
+
+    target_link_libraries(
+        dns-tools-crypto
+            PRIVATE
+                OpenSSL::Crypto
+                dns-tools-commons
+                dns-tools-dns
     )
 
 # Context library
