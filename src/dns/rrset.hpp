@@ -7,7 +7,7 @@
 #include "rr.hpp"
 
 namespace dns {
-    struct RRSet {
+    struct DNSResourceRecordSet {
         std::string name;
         rr_type_t type;
         rr_class_t rclass;
@@ -15,9 +15,11 @@ namespace dns {
         std::vector<DNSResourceRecord> records;
     };
 
-    std::vector<RRSet> groupIntoRRsets(const std::vector<DNSResourceRecord>& records);
+    typedef std::vector<DNSResourceRecordSet> DNSResourceRecordSetList;
 
-    std::vector<uint8_t> rrsetToWire(const RRSet& rrset);
+    DNSResourceRecordSetList groupIntoRRsets(const std::vector<DNSResourceRecord>& records);
+
+    std::vector<uint8_t> rrsetToWire(const DNSResourceRecordSet& rrset);
 }
 
 #endif // DNS_RRSET_HPP

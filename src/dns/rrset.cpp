@@ -7,14 +7,14 @@
 #include <algorithm>
 
 namespace dns {
-    std::vector<RRSet> groupIntoRRsets(const std::vector<DNSResourceRecord>& records) {
-        std::map<std::tuple<std::string, uint16_t>, RRSet> map;
+    DNSResourceRecordSetList groupIntoRRsets(const std::vector<DNSResourceRecord>& records) {
+        std::map<std::tuple<std::string, uint16_t>, DNSResourceRecordSet> map;
         
         for (const auto& rr : records) {
             auto key = std::make_tuple(toLower(rr.name), rr.type);
             
             if (map.find(key) == map.end()) {
-                RRSet rrset;
+                DNSResourceRecordSet rrset;
                 rrset.name = toLower(rr.name);
                 rrset.type = rr.type;
                 rrset.rclass = rr.rclass;
@@ -25,7 +25,7 @@ namespace dns {
             map[key].records.push_back(rr);
         }
         
-        std::vector<RRSet> result;
+        DNSResourceRecordSetList result;
         for (auto& pair : map) {
             // Sort RRset canonically
             std::sort(pair.second.records.begin(), pair.second.records.end(),
@@ -36,7 +36,7 @@ namespace dns {
         return result;
     }
 
-    std::vector<uint8_t> rrsetToWire(const RRSet& rrset) {
+    std::vector<uint8_t> rrsetToWire(const DNSResourceRecordSet& rrset) {
         std::vector<uint8_t> wire;
         
         for (const auto& rr : rrset.records) {
