@@ -14,6 +14,7 @@
 
 #include "wire_format.hpp"
 #include "rr.hpp"
+#include "string_commons.hpp"
 
 
 namespace dns {
@@ -248,7 +249,7 @@ namespace dns {
                 if (token == "@") {
                     rr.name = origin;
                 } else {
-                    token = toLower(token);
+                    token = commons::toLower(token);
                     rr.name = token;
                     if (!rr.name.empty() && rr.name.back() != '.') {
                         rr.name += "." + origin;
@@ -307,7 +308,7 @@ namespace dns {
                     std::string name;
                     iss >> name;
                     if (!name.empty() && name.back() != '.') name += "." + origin;
-                    rdata = encodeName(name);
+                    rdata = commons::encodeDomainName(name);
                     break;
                 }
                 case RR_TYPE_SOA: {
@@ -318,8 +319,8 @@ namespace dns {
                     if (!mname.empty() && mname.back() != '.') mname += "." + origin;
                     if (!rname.empty() && rname.back() != '.') rname += "." + origin;
                     
-                    auto mname_enc = encodeName(mname);
-                    auto rname_enc = encodeName(rname);
+                    auto mname_enc = commons::encodeDomainName(mname);
+                    auto rname_enc = commons::encodeDomainName(rname);
                     
                     rdata.insert(rdata.end(), mname_enc.begin(), mname_enc.end());
                     rdata.insert(rdata.end(), rname_enc.begin(), rname_enc.end());
@@ -336,7 +337,7 @@ namespace dns {
                     if (!exchange.empty() && exchange.back() != '.') exchange += "." + origin;
                     
                     writeUint16(rdata, std::stoi(pref));
-                    auto exch = encodeName(exchange);
+                    auto exch = commons::encodeDomainName(exchange);
                     rdata.insert(rdata.end(), exch.begin(), exch.end());
                     break;
                 }
@@ -416,7 +417,7 @@ namespace dns {
                     
                     // Signer's name
                     if (!signer.empty() && signer.back() != '.') signer += "." + origin;
-                    auto signer_enc = encodeName(signer);
+                    auto signer_enc = commons::encodeDomainName(signer);
                     rdata.insert(rdata.end(), signer_enc.begin(), signer_enc.end());
                     
                     // Signature (base64, rest of line)
@@ -436,7 +437,7 @@ namespace dns {
                     iss >> next_name;
                     
                     if (!next_name.empty() && next_name.back() != '.') next_name += "." + origin;
-                    auto next_enc = encodeName(next_name);
+                    auto next_enc = commons::encodeDomainName(next_name);
                     rdata.insert(rdata.end(), next_enc.begin(), next_enc.end());
                     
                     // Parse type bitmap
@@ -582,7 +583,7 @@ namespace dns {
         }
 
         rr_type_t parseType(std::string& type_str) {
-            std::string copy = toUpper(type_str);     
+            std::string copy = commons::toUpper(type_str);     
             auto it = str_to_rr_type_t.find(copy);
             if (it != str_to_rr_type_t.end()) {
                 return it->second;
@@ -592,7 +593,7 @@ namespace dns {
         }
     
         rr_class_t parseClass(std::string& class_str) {
-            std::string copy = toUpper(class_str);
+            std::string copy = commons::toUpper(class_str);
             
             auto it = str_to_rr_class_t.find(copy);
             if (it != str_to_rr_class_t.end()) {

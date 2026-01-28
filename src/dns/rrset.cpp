@@ -1,6 +1,7 @@
 #include "wire_format.hpp"
 #include "rr.hpp"
 #include "rrset.hpp"
+#include "string_commons.hpp"
 #include <vector>
 #include <map>
 #include <tuple>
@@ -11,11 +12,11 @@ namespace dns {
         std::map<std::tuple<std::string, uint16_t>, DNSResourceRecordSet> map;
         
         for (const auto& rr : records) {
-            auto key = std::make_tuple(toLower(rr.name), rr.type);
+            auto key = std::make_tuple(commons::toLower(rr.name), rr.type);
             
             if (map.find(key) == map.end()) {
                 DNSResourceRecordSet rrset;
-                rrset.name = toLower(rr.name);
+                rrset.name = commons::toLower(rr.name);
                 rrset.type = rr.type;
                 rrset.rclass = rr.rclass;
                 rrset.ttl = rr.ttl;

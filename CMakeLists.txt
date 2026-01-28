@@ -13,6 +13,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(CLI11 REQUIRED)
 find_package(OpenSSL REQUIRED)
 
+# Commons library
+    add_library(
+        dns-tools-commons
+            src/commons/string_commons.cpp
+    )
+
+    target_include_directories(
+        dns-tools-commons
+            PUBLIC
+                src/commons
+    )
+
 # Crypto library
     add_library(
         dns-tools-crypto
@@ -46,12 +58,14 @@ find_package(OpenSSL REQUIRED)
         dns-tools-dns
             PUBLIC
                 src/dns
+                src/commons
     )
 
     target_link_libraries(
         dns-tools-dns
             PRIVATE
                 dns-tools-crypto
+                dns-tools-commons
     )
 
 # Context library

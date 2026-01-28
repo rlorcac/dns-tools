@@ -37,32 +37,4 @@ namespace dns {
         return val;
     }
 
-    // DNS name encoding
-    std::vector<uint8_t> encodeName(const std::string& name) {
-        std::vector<uint8_t> result;
-        std::istringstream iss(name);
-        std::string label;
-        
-        while (std::getline(iss, label, '.')) {
-            if (label.empty()) break; // root
-            if (label.length() > 63) throw std::runtime_error("Label too long");
-            result.push_back(label.length());
-            result.insert(result.end(), label.begin(), label.end());
-        }
-        result.push_back(0); // root
-        return result;
-    }
-
-    std::string toLower(const std::string& s) {
-        std::string result = "";
-        for (auto& c : s) result += std::tolower(c);
-        return result;
-    }
-
-    std::string toUpper(const std::string& s) {
-        std::string result = "";
-        for (auto& c : s) result += std::toupper(c);
-        return result;
-    }
-
 } // namespace dns

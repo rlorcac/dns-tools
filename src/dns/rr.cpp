@@ -4,11 +4,12 @@
 #include <iomanip>
 #include "rr.hpp"
 #include "wire_format.hpp"
+#include "string_commons.hpp"
 
 namespace dns {
     std::vector<uint8_t> DNSResourceRecord::toWire() const {
             std::vector<uint8_t> wire;
-            auto name_wire = encodeName(toLower(name));
+            auto name_wire = commons::encodeDomainName(commons::toLower(name));
             wire.insert(wire.end(), name_wire.begin(), name_wire.end());
             writeUint16(wire, type);
             writeUint16(wire, rclass);
@@ -45,7 +46,7 @@ namespace dns {
     std::ostream& operator<<(std::ostream& os, const DNSResourceRecord& rr) {
         os << rr.name << "\t" << std::dec << rr.ttl << "\t" << rr.rclass << "\t" << rr.type << "\t";
         for (uint8_t byte : rr.rdata) {
-            os << std::hex << std::setfill('0') << std::setw(2) << (int)byte;
+            os << commons::escape((char)byte);
         }
         return os;
     }
