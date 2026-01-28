@@ -5,14 +5,14 @@
 #ifndef CRYPTO_DIGEST_HPP // CRYPTO_DIGEST_HPP
 #define CRYPTO_DIGEST_HPP
 
+namespace crypto {
+    typedef int DigestAlgorithm;
 
-typedef int DigestAlgorithm;
+    enum : DigestAlgorithm {
+        SHA384 = 1,
+        SHA512 = 2,
+    };
 
-enum : DigestAlgorithm {
-    SHA384 = 1,
-    SHA512 = 2,
-};
-
-extern std::unordered_map<std::string, DigestAlgorithm> stringToDigestAlgorithm;
-
+    extern std::unordered_map<std::string, DigestAlgorithm> stringToDigestAlgorithm;
+}
 #endif // CRYPTO_DIGEST_HPP

@@ -63,7 +63,7 @@ CLI::App *register_sign(CLI::App &app) {
         "Origin zone name. If not specified, $ORIGIN inside the file will be used.");
     sc->add_option("-a,--sign-algorithm", OPTION_STRUCT->sign.signAlgorithm, 
         "Signing algorithm to be used. Supported values are: rsa, ecdsa.")
-        ->transform(CLI::Transformer(stringToSignAlgorithm, CLI::ignore_case));
+        ->transform(CLI::Transformer(crypto::stringToSignAlgorithm, CLI::ignore_case));
     sc->add_option("-o,--output", OPTION_STRUCT->sign.output, 
         "Output for the signed zone file. By default based on zone file name with '-signed' suffix.");
     sc->add_option("-D,--rrsig-duration", OPTION_STRUCT->sign.rrsigDuration, 
@@ -77,7 +77,7 @@ CLI::App *register_sign(CLI::App &app) {
     // integer options
     sc->add_option("-Q,--hash-digest", OPTION_STRUCT->sign.hashDigest,
         "Hash algorithm for digest verification. Supported values are: sha384, sha512.")
-         ->transform(CLI::Transformer(stringToDigestAlgorithm, CLI::ignore_case));
+         ->transform(CLI::Transformer(crypto::stringToDigestAlgorithm, CLI::ignore_case));
     
     register_sign_file(*sc);
     register_sign_pkcs11(*sc);
