@@ -42,7 +42,7 @@ namespace dns {
     }
 
     std::ostream& operator<<(std::ostream& os, const DNSResourceRecord& rr) {
-        os << rr.name << "\t" << rr.ttl << "\t" << rr.rclass << "\t" << rr.type << "\t";
+        os << rr.name << "\t" << std::dec << rr.ttl << "\t" << rr.rclass << "\t" << rr.type << "\t";
         for (uint8_t byte : rr.rdata) {
             os << std::hex << (int)byte;
         }
