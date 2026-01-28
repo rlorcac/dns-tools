@@ -12,9 +12,9 @@
 #ifndef DNS_ZONE_PARSER_HPP // DNS_ZONE_PARSER_HPP
 #define DNS_ZONE_PARSER_HPP
 
+#include "string_commons.hpp"
 #include "wire_format.hpp"
 #include "rr.hpp"
-#include "string_commons.hpp"
 
 
 namespace dns {
@@ -75,157 +75,46 @@ namespace dns {
         }
 
         std::string readMultiLineRecord(std::string first_line) {
-        // Remove opening parenthesis
-        size_t open_paren = first_line.find('(');
-        first_line.erase(open_paren, 1);
-        
-        std::string full_line = first_line;
-        
-        // Check if closing paren is on same line
-        if (first_line.find(')') != std::string::npos) {
-            size_t close_paren = full_line.find(')');
-            full_line.erase(close_paren, 1);
-            return full_line;
-        }
-        
-        // Read until closing parenthesis
-        std::string next_line;
-        while (std::getline(file, next_line)) {
-            // Strip comments
-            size_t comment = next_line.find(';');
-            if (comment != std::string::npos) {
-                next_line = next_line.substr(0, comment);
+            // Remove opening parenthesis
+            size_t open_paren = first_line.find('(');
+            first_line.erase(open_paren, 1);
+            
+            std::string full_line = first_line;
+            
+            // Check if closing paren is on same line
+            if (first_line.find(')') != std::string::npos) {
+                size_t close_paren = full_line.find(')');
+                full_line.erase(close_paren, 1);
+                return full_line;
             }
             
-            // Trim
-            next_line.erase(0, next_line.find_first_not_of(" \t"));
-            next_line.erase(next_line.find_last_not_of(" \t\r\n") + 1);
-            
-            if (next_line.empty()) continue;
-            
-            size_t close_paren = next_line.find(')');
-            if (close_paren != std::string::npos) {
-                // Found closing paren
-                next_line.erase(close_paren, 1);
+            // Read until closing parenthesis
+            std::string next_line;
+            while (std::getline(file, next_line)) {
+                // Strip comments
+                size_t comment = next_line.find(';');
+                if (comment != std::string::npos) {
+                    next_line = next_line.substr(0, comment);
+                }
+                
+                // Trim
+                next_line.erase(0, next_line.find_first_not_of(" \t"));
+                next_line.erase(next_line.find_last_not_of(" \t\r\n") + 1);
+                
+                if (next_line.empty()) continue;
+                
+                size_t close_paren = next_line.find(')');
+                if (close_paren != std::string::npos) {
+                    // Found closing paren
+                    next_line.erase(close_paren, 1);
+                    full_line += " " + next_line;
+                    break;
+                }
+                
                 full_line += " " + next_line;
-                break;
             }
             
-            full_line += " " + next_line;
-        }
-        
-        return full_line;
-    }
-
-        std::vector<uint8_t> parseIPv4(const std::string& ip) {
-            std::vector<uint8_t> bytes;
-            std::istringstream iss(ip);
-            std::string octet;
-            
-            while (std::getline(iss, octet, '.')) {
-                int val = std::stoi(octet);
-                if (val < 0 || val > 255) {
-                    throw std::runtime_error("Invalid IPv4 address: " + ip);
-                }
-                bytes.push_back(static_cast<uint8_t>(val));
-            }
-            
-            if (bytes.size() != 4) {
-                throw std::runtime_error("Invalid IPv4 address: " + ip);
-            }
-            
-            return bytes;
-        }
-
-        std::vector<uint8_t> parseIPv6(const std::string& ip) {
-            std::vector<uint8_t> bytes;
-            bool has_double_colon = false;
-            size_t double_colon_pos = 0;
-            
-            // Split by ':' and process
-            std::vector<std::string> segments;
-            size_t pos = 0;
-            
-            while (pos < ip.length()) {
-                if (ip[pos] == ':') {
-                    if (pos + 1 < ip.length() && ip[pos + 1] == ':') {
-                        if (has_double_colon) {
-                            throw std::runtime_error("Invalid IPv6 address: multiple '::'");
-                        }
-                        has_double_colon = true;
-                        double_colon_pos = segments.size();
-                        pos += 2;
-                        continue;
-                    }
-                    pos++;
-                    continue;
-                }
-                
-                size_t next_colon = ip.find(':', pos);
-                if (next_colon == std::string::npos) next_colon = ip.length();
-                
-                std::string segment = ip.substr(pos, next_colon - pos);
-                if (!segment.empty()) {
-                    segments.push_back(segment);
-                }
-                pos = next_colon;
-            }
-            
-            // Convert segments to bytes
-            for (const auto& segment : segments) {
-                int val = std::stoi(segment, nullptr, 16);
-                if (val < 0 || val > 0xFFFF) {
-                    throw std::runtime_error("Invalid IPv6 segment: " + segment);
-                }
-                bytes.push_back(static_cast<uint8_t>((val >> 8) & 0xFF));
-                bytes.push_back(static_cast<uint8_t>(val & 0xFF));
-            }
-            
-            // Handle '::' expansion
-            if (has_double_colon) {
-                int missing_segments = 8 - segments.size();
-                if (missing_segments < 0) {
-                    throw std::runtime_error("Invalid IPv6 address: too many segments");
-                }
-                size_t insert_pos = double_colon_pos * 2;
-                bytes.insert(bytes.begin() + insert_pos, missing_segments * 2, 0);
-            }
-            
-            if (bytes.size() != 16) {
-                std::cerr << "Bytes size: " << bytes.size() << " for IPv6: " << ip << "\n";
-                throw std::runtime_error("Invalid IPv6 address: " + ip);
-            }
-            
-            return bytes;
-        }
-
-        uint32_t parseTimestamp(const std::string& timestamp_str) {
-            if (timestamp_str.length() != 14) {
-                throw std::runtime_error("Invalid timestamp format: " + timestamp_str);
-            }
-            
-            int year = std::stoi(timestamp_str.substr(0, 4));
-            int month = std::stoi(timestamp_str.substr(4, 2));
-            int day = std::stoi(timestamp_str.substr(6, 2));
-            int hour = std::stoi(timestamp_str.substr(8, 2));
-            int minute = std::stoi(timestamp_str.substr(10, 2));
-            int second = std::stoi(timestamp_str.substr(12, 2));
-            
-            struct tm timeinfo = {};
-            timeinfo.tm_year = year - 1900;
-            timeinfo.tm_mon = month - 1;
-            timeinfo.tm_mday = day;
-            timeinfo.tm_hour = hour;
-            timeinfo.tm_min = minute;
-            timeinfo.tm_sec = second;
-            timeinfo.tm_isdst = -1;
-            
-            time_t timestamp = mktime(&timeinfo);
-            if (timestamp == -1) {
-                throw std::runtime_error("Invalid timestamp: " + timestamp_str);
-            }
-            
-            return static_cast<uint32_t>(timestamp);
+            return full_line;
         }
 
         DNSResourceRecord parseRR(const std::string& line) {
@@ -301,7 +190,7 @@ namespace dns {
                 case RR_TYPE_A: {
                     std::string ip;
                     iss >> ip;
-                    rdata = parseIPv4(ip);
+                    rdata = commons::parseIPv4(ip);
                     break;
                 }
                 case RR_TYPE_NS: case RR_TYPE_CNAME: {
@@ -360,7 +249,7 @@ namespace dns {
                 case RR_TYPE_AAAA: {
                     std::string ip;
                     iss >> ip;
-                    rdata = parseIPv6(ip);
+                    rdata = commons::parseIPv6(ip);
                     break;
                 }
                 case RR_TYPE_DS: {
@@ -407,10 +296,10 @@ namespace dns {
                     writeUint32(rdata, std::stoul(orig_ttl));
                     
                     // Signature expiration (YYYYMMDDHHmmSS format)
-                    writeUint32(rdata, parseTimestamp(sig_exp));
+                    writeUint32(rdata, commons::parseTimestamp(sig_exp));
                     
                     // Signature inception
-                    writeUint32(rdata, parseTimestamp(sig_inc));
+                    writeUint32(rdata, commons::parseTimestamp(sig_inc));
                     
                     // Key tag
                     writeUint16(rdata, std::stoi(key_tag));
@@ -425,7 +314,7 @@ namespace dns {
                     iss >> sig_b64;
                     
                     // Decode base64
-                    auto signature = base64Decode(sig_b64);
+                    auto signature = commons::decodeBase64(sig_b64);
                     rdata.insert(rdata.end(), signature.begin(), signature.end());
                     break;
                 }
@@ -473,7 +362,7 @@ namespace dns {
                                     ::isspace), pubkey_b64.end());
                     
                     // Decode base64
-                    auto pubkey = base64Decode(pubkey_b64);
+                    auto pubkey = commons::decodeBase64(pubkey_b64);
                     rdata.insert(rdata.end(), pubkey.begin(), pubkey.end());
                     break;
                 }
@@ -510,40 +399,6 @@ namespace dns {
             return rdata;
         }
 
-        // Base64 decode (simplified)
-        std::vector<uint8_t> base64Decode(const std::string& encoded) {
-        static const std::string base64_chars = 
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz"
-            "0123456789+/";
-        
-        std::vector<uint8_t> decoded;
-        std::string cleaned;
-        
-        // Remove whitespace and padding
-        for (char c : encoded) {
-            if (!std::isspace(c) && c != '=') {
-                cleaned += c;
-            }
-        }
-        
-        for (size_t i = 0; i < cleaned.length(); i += 4) {
-            uint32_t val = 0;
-            
-            for (int j = 0; j < 4 && (i + j) < cleaned.length(); j++) {
-                size_t pos = base64_chars.find(cleaned[i + j]);
-                if (pos == std::string::npos) continue;
-                val = (val << 6) | pos;
-            }
-            
-            decoded.push_back((val >> 16) & 0xFF);
-            if (i + 2 < cleaned.length()) decoded.push_back((val >> 8) & 0xFF);
-            if (i + 3 < cleaned.length()) decoded.push_back(val & 0xFF);
-        }
-        
-        return decoded;
-    }
-        // Encode type bitmap for NSEC
         std::vector<uint8_t> encodeTypeBitmap(const std::vector<uint16_t>& types) {
             if (types.empty()) return {};
             

@@ -17,8 +17,18 @@ namespace commons {
 
     std::string escape(const std::string& s);
 
+    std::vector<uint8_t> parseIPv4(const std::string& ip);
+
+    std::vector<uint8_t> parseIPv6(const std::string& ip);
+
+    uint32_t parseTimestamp(const std::string& timestamp_str);
+
     // DNS name encoding
     std::vector<uint8_t> encodeDomainName(const std::string& name);
+
+    std::vector<uint8_t> decodeBase64(const std::string& encoded);
+
+    std::string encodeBase64(const std::vector<uint8_t>& data);
 
 }
 
