@@ -216,7 +216,7 @@ namespace dns {
             std::string sig_b64 = commons::encodeBase64(signature);
 
             // Output in pretty format
-            os << (dns::rr_type_t) type_covered << " " << static_cast<int>(algorithm) << " "
+            os << static_cast<dns::rr_type_t>(type_covered) << " " << static_cast<int>(algorithm) << " "
                << static_cast<int>(labels) << " " << orig_ttl << " "
                << sig_exp << " " << sig_inc << " " << key_tag << " "
                << signer_name << " " << sig_b64;
