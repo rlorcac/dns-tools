@@ -153,8 +153,6 @@ namespace dns {
             if (!blank_name) {
                 iss >> token;
             }
-            // Check if next token is TTL (numeric) or CLASS (IN/OUT/etc)
-            size_t pos = iss.tellg();
             
             bool token_is_numeric = !token.empty() && std::all_of(token.begin(), token.end(), ::isdigit);
             
@@ -179,7 +177,7 @@ namespace dns {
             
             // RDATA
             rr.rdata = parseRData(rr.type, iss, origin);
-            
+
             return rr;
         }
         

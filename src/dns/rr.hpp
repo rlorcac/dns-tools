@@ -19,7 +19,7 @@ namespace dns {
 
     typedef enum rr_class_enum rr_class_t;
 
-// list per IANA DNS Parameters - RR TYPEs (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4)
+    // list per IANA DNS Parameters - RR TYPEs (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4)
     enum rr_type_enum : uint16_t {
         // 0 is reserved
         RR_TYPE_A = 1,
@@ -343,6 +343,10 @@ namespace dns {
         {RR_CLASS_NONE, "NONE"},
         {RR_CLASS_ANY, "ANY"}
     };
+    
+    // Forward declarations for operator<< overloads
+    std::ostream& operator<<(std::ostream& os, const rr_class_t& rclass);
+    std::ostream& operator<<(std::ostream& os, const rr_type_t& rtype);
     
     class DNSResourceRecord {
     public:

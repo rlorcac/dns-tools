@@ -25,11 +25,12 @@ namespace commons {
 
     // DNS name encoding
     std::vector<uint8_t> encodeDomainName(const std::string& name);
-
-    std::vector<uint8_t> decodeBase64(const std::string& encoded);
+    
+    std::string decodeDomainName(const std::vector<uint8_t>& rdata, size_t& offset);
 
     std::string encodeBase64(const std::vector<uint8_t>& data);
 
+    std::vector<uint8_t> decodeBase64(const std::string& encoded);
 }
 
 #endif // COMMONS_STRING_COMMONS_HPP

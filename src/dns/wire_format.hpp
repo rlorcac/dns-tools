@@ -9,16 +9,16 @@
 
 namespace dns {
 
-// Wire format helpers
-void writeUint8(std::vector<uint8_t>& buf, uint8_t val);
+    // Wire format helpers
+    void writeUint8(std::vector<uint8_t>& buf, uint8_t val);
 
-void writeUint16(std::vector<uint8_t>& buf, uint16_t val);
+    void writeUint16(std::vector<uint8_t>& buf, uint16_t val);
 
-void writeUint32(std::vector<uint8_t>& buf, uint32_t val);
+    void writeUint32(std::vector<uint8_t>& buf, uint32_t val);
 
-uint16_t readUint16(const uint8_t* buf, size_t& offset);
+    uint16_t readUint16(const uint8_t* buf, size_t& offset);
 
-uint32_t readUint32(const uint8_t* buf, size_t& offset);
+    uint32_t readUint32(const uint8_t* buf, size_t& offset);
 
 } // namespace dns
 

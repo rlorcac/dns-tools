@@ -40,9 +40,21 @@ namespace dns {
     std::vector<uint8_t> rrsetToWire(const DNSResourceRecordSet& rrset) {
         std::vector<uint8_t> wire;
         
+        // For DNSSEC signing, all RRs must use the RRset's owner name and TTL
+        // RFC 4034 Section 3.1.8.1
         for (const auto& rr : rrset.records) {
-            auto rr_wire = rr.toWire();
-            wire.insert(wire.end(), rr_wire.begin(), rr_wire.end());
+            // Encode owner name (canonical lowercase)
+            auto name_wire = commons::encodeDomainName(commons::toLower(rrset.name));
+            wire.insert(wire.end(), name_wire.begin(), name_wire.end());
+            
+            // Type, class, TTL (use RRset's TTL, not individual RR's TTL)
+            writeUint16(wire, rrset.type);
+            writeUint16(wire, rrset.rclass);
+            writeUint32(wire, rrset.ttl);
+            
+            // RDATA length and RDATA
+            writeUint16(wire, rr.rdata.size());
+            wire.insert(wire.end(), rr.rdata.begin(), rr.rdata.end());
         }
         
         return wire;

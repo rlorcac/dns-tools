@@ -33,6 +33,7 @@ find_package(OpenSSL REQUIRED)
             src/dns/zone_parser.cpp
             src/dns/rrset.cpp
             src/dns/nsec.cpp
+            src/dns/zone_writer.cpp
     )
 
     target_include_directories(
@@ -126,7 +127,6 @@ target_link_libraries(
     dns-tools
     PRIVATE
         dns-tools-cli
-        dns-tools-crypto
 )
 
 target_include_directories(

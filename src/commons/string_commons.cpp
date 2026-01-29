@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
+#include <iomanip>
 
 #include "string_commons.hpp"
 
@@ -25,7 +26,9 @@ namespace commons {
 
     std::string escape(char c) {
         if ((int) c < 32 || (int) c > 126) {
-            return "\\0x" + std::to_string((int)c);
+            std::ostringstream oss;
+            oss << "\\0x" << std::hex << std::setw(2) << std::setfill('0') << (int)c;
+            return oss.str();
         } else {
             return std::string(1, c);
         }
@@ -164,7 +167,53 @@ namespace commons {
         result.push_back(0); // root
         return result;
     }
+
+    std::string decodeDomainName(const std::vector<uint8_t>& rdata, size_t& offset) {
+            std::string name;
+            while (offset < rdata.size()) {
+                uint8_t len = rdata[offset];
+                offset++;
+
+                if (len == 0) {
+                    break;  // Root label
+                }
+
+                if (offset + len > rdata.size()) {
+                    throw std::runtime_error("Invalid domain name in RRSIG");
+                }
+
+                if (!name.empty()) {
+                    name += ".";
+                }
+
+                name.append(reinterpret_cast<const char*>(&rdata[offset]), len);
+                offset += len;
+            }
+
+            return name.empty() ? "." : name;
+        }
     
+    std::string encodeBase64(const std::vector<uint8_t>& data) {
+        static const char* base64_chars = 
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz"
+            "0123456789+/";
+        
+        std::string result;
+        int val = 0, valb = -6;
+        for (uint8_t c : data) {
+            val = (val << 8) + c;
+            valb += 8;
+            while (valb >= 0) {
+                result.push_back(base64_chars[(val >> valb) & 0x3F]);
+                valb -= 6;
+            }
+        }
+        if (valb > -6) result.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
+        while (result.size() % 4) result.push_back('=');
+        return result;
+    }
+
     std::vector<uint8_t> decodeBase64(const std::string& encoded) {
         static const std::string base64_chars = 
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -188,25 +237,4 @@ namespace commons {
         return decoded;
     }
     
-    std::string encodeBase64(const std::vector<uint8_t>& data) {
-        static const char* base64_chars = 
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz"
-            "0123456789+/";
-        
-        std::string result;
-        int val = 0, valb = -6;
-        for (uint8_t c : data) {
-            val = (val << 8) + c;
-            valb += 8;
-            while (valb >= 0) {
-                result.push_back(base64_chars[(val >> valb) & 0x3F]);
-                valb -= 6;
-            }
-        }
-        if (valb > -6) result.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
-        while (result.size() % 4) result.push_back('=');
-        return result;
-    }
-
 }
