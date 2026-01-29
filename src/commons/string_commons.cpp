@@ -154,8 +154,9 @@ namespace commons {
     }
 
     std::vector<uint8_t> encodeDomainName(const std::string& name) {
+        std::string lower = toLower(name);
         std::vector<uint8_t> result;
-        std::istringstream iss(name);
+        std::istringstream iss(lower);
         std::string label;
         
         while (std::getline(iss, label, '.')) {
