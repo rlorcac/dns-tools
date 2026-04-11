@@ -180,7 +180,7 @@ namespace commons {
                 }
 
                 if (offset + len > rdata.size()) {
-                    throw std::runtime_error("Invalid domain name in RRSIG");
+                    throw std::runtime_error("Invalid domain name: label length exceeds RDATA size");
                 }
 
                 if (!name.empty()) {
@@ -190,8 +190,8 @@ namespace commons {
                 name.append(reinterpret_cast<const char*>(&rdata[offset]), len);
                 offset += len;
             }
-
-            return name.empty() ? "." : name;
+            name += ".";
+            return name;
         }
     
     std::string encodeBase64(const std::vector<uint8_t>& data) {
