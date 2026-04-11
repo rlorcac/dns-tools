@@ -78,7 +78,12 @@ namespace crypto {
     dns::DNSResourceRecord DNSSECSigner::signRRSet(const dns::DNSResourceRecordSet& rrset, uint32_t sig_validity_days = 30) {
         EVP_PKEY* key = (rrset.type == dns::RR_TYPE_DNSKEY) ? ksk : zsk;
         dns::dnssec_key_t key_type = (rrset.type == dns::RR_TYPE_DNSKEY) ? dns::DNSSEC_KSK : dns::DNSSEC_ZSK;
-        
+        std::sort(rrset.records.begin(), rrset.records.end(),
+            [](const dns::DNSResourceRecord& a, const dns::DNSResourceRecord& b) {
+                return a.rdata < b.rdata;
+            }
+        );
+
         dns::DNSResourceRecord rrsig;
         rrsig.name = rrset.name;
         rrsig.type = dns::RR_TYPE_RRSIG;
@@ -106,6 +111,7 @@ namespace crypto {
         
         std::vector<uint8_t> to_sign = rrsig_rdata;
         std::vector<uint8_t> rrset_wire = rrsetToWire(rrset);
+
         to_sign.insert(to_sign.end(), rrset_wire.begin(), rrset_wire.end());
         
         size_t sig_len = 0;

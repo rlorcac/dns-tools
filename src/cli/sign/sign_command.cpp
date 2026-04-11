@@ -63,7 +63,7 @@ CLI::App *register_sign_file(CLI::App &app) {
             
             // Sign each RRset
             for (const auto& pair : rrsets) {
-                const auto& rrset = pair.second;
+                auto rrset = pair.second;
                 dns::DNSResourceRecord rrsig = signer.signRRSet(rrset, 90); // 90 days validity
                 signed_records.push_back(rrsig);
                 for (const auto& rr : rrset.records) {
