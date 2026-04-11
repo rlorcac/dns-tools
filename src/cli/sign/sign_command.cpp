@@ -1,5 +1,7 @@
 #include "sign/sign_command.hpp"
 #include "sign/sign.hpp"
+#include "zone_parser.hpp"
+#include "zone_writer.hpp"
 #include "context.hpp"
 #include <CLI/CLI.hpp>
 #include <CLI/Formatter.hpp>
@@ -9,10 +11,75 @@ CLI::App *register_sign_file(CLI::App &app) {
     CLI::App *sc = app.add_subcommand("file", "uses keys from a file to sign the zone");
     
     sc->add_option("-K,--ksk-file", OPTION_STRUCT->sign.fileOptions.kskFile, 
-        "Full path to KSK key file.");
+        "Full path to KSK key file.")->required();
     sc->add_option("-Z,--zsk-file", OPTION_STRUCT->sign.fileOptions.zskFile, 
-        "Full path to ZSK key file.");
+        "Full path to ZSK key file.")->required();
     
+    sc->callback(
+        [&](){
+            if (OPTION_STRUCT->sign.createKeys) {
+                crypto::DNSSECSigner signer(OPTION_STRUCT->sign.zone);
+                signer.generateKeys();
+                signer.saveKeys(
+                    OPTION_STRUCT->sign.fileOptions.zskFile,
+                    OPTION_STRUCT->sign.fileOptions.kskFile
+                );
+                return;
+            }
+            dns::SimpleZoneParser parser;
+            auto records = parser.parse(OPTION_STRUCT->sign.file, OPTION_STRUCT->sign.zone);
+            
+            crypto::DNSSECSigner signer(OPTION_STRUCT->sign.zone);
+            signer.loadKeys(
+                OPTION_STRUCT->sign.fileOptions.zskFile,
+                OPTION_STRUCT->sign.fileOptions.kskFile
+            );
+            
+            std::vector<dns::DNSResourceRecord> dnskey_records = signer.getDNSKEYRecords(3600);
+            std::vector<dns::DNSResourceRecord> signed_records;
+            
+            // Group records by name, type, class for signing
+            std::map<std::tuple<std::string, dns::rr_type_t, dns::rr_class_t>, dns::DNSResourceRecordSet> rrsets;
+            
+            // Add DNSKEY records to the RRsets for signing
+            for (const auto& rr : dnskey_records) {
+                auto key = std::make_tuple(rr.name, rr.type, rr.rclass);
+                rrsets[key].name = rr.name;
+                rrsets[key].type = rr.type;
+                rrsets[key].rclass = rr.rclass;
+                rrsets[key].ttl = rr.ttl;
+                rrsets[key].records.push_back(rr);
+            }
+            
+            // Add zone records to RRsets
+            for (const auto& rr : records) {
+                auto key = std::make_tuple(rr.name, rr.type, rr.rclass);
+                rrsets[key].name = rr.name;
+                rrsets[key].type = rr.type;
+                rrsets[key].rclass = rr.rclass;
+                rrsets[key].ttl = rr.ttl;
+                rrsets[key].records.push_back(rr);
+            }
+            
+            // Sign each RRset
+            for (const auto& pair : rrsets) {
+                const auto& rrset = pair.second;
+                dns::DNSResourceRecord rrsig = signer.signRRSet(rrset, 90); // 90 days validity
+                signed_records.push_back(rrsig);
+                for (const auto& rr : rrset.records) {
+                    signed_records.push_back(rr);
+                }
+            }
+            
+            dns::ZoneWriter writer;
+            writer.writeZoneFile(
+                OPTION_STRUCT->sign.output,
+                signed_records,
+                OPTION_STRUCT->sign.zone
+            );
+        }
+    );
+
     return sc;
 }
 
