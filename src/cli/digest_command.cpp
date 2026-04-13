@@ -1,6 +1,6 @@
-#include "digest/digest_command.hpp"
-#include "hash/digest.hpp"
-#include "context.hpp"
+#include "cli/digest_command.hpp"
+#include "crypto/digest.hpp"
+#include "context/context.hpp"
 #include <CLI/CLI.hpp>
 
 CLI::App *register_digest(CLI::App &app) {

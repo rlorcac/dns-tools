@@ -2,14 +2,14 @@
 #include <string>
 #include <cstdint>
 #include <iomanip>
-#include "rr.hpp"
-#include "wire_format.hpp"
-#include "string_commons.hpp"
+#include "commons/string_commons.hpp"
+#include "dns/rr.hpp"
+#include "dns/wire_format.hpp"
 
 namespace dns {
     std::vector<uint8_t> DNSResourceRecord::toWire() const {
             std::vector<uint8_t> wire;
-            auto name_wire = commons::encodeDomainName(commons::toLower(name));
+            std::vector<uint8_t> name_wire = commons::encodeDomainName(commons::toLower(name));
             wire.insert(wire.end(), name_wire.begin(), name_wire.end());
             writeUint16(wire, type);
             writeUint16(wire, rclass);

@@ -1,8 +1,8 @@
-#include "rr.hpp"
-#include "rrset.hpp"
-#include "wire_format.hpp"
-#include "string_commons.hpp"
-#include "dnssec_keys.hpp"
+#include "dns/rr.hpp"
+#include "dns/rrset.hpp"
+#include "dns/wire_format.hpp"
+#include "dns/dnssec_keys.hpp"
+#include "commons/string_commons.hpp"
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -44,7 +44,7 @@ namespace crypto {
 
         void saveKeys(const std::string& zsk_file, const std::string& ksk_file);
 
-        dns::DNSResourceRecord signRRSet(const dns::DNSResourceRecordSet& rrset, uint32_t sig_validity_days);
+        dns::DNSResourceRecord signRRSet(dns::DNSResourceRecordSet& rrset, uint32_t sig_validity_days);
         
     private:
         dns::DNSResourceRecord createDNSKEY(EVP_PKEY* key, uint16_t flags, uint32_t ttl, uint8_t algorithm = 8, uint8_t protocol = 3) {

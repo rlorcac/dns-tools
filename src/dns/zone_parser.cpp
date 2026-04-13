@@ -1,6 +1,6 @@
-#include "wire_format.hpp"
-#include "rr.hpp"
-#include "zone_parser.hpp"
+#include "dns/wire_format.hpp"
+#include "dns/rr.hpp"
+#include "dns/zone_parser.hpp"
 #include <fstream>
 #include <unordered_map>
 #include <ctime>

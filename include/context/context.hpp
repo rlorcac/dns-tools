@@ -7,8 +7,8 @@
 #ifndef CONTEXT_HPP // CONTEXT_HPP
 #define CONTEXT_HPP
 
-#include "sign/sign.hpp"
-#include "hash/digest.hpp"
+#include "crypto/sign.hpp"
+#include "crypto/digest.hpp"
 
 struct DigestOptions {
     // digest command options

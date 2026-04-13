@@ -1,9 +1,9 @@
-#include "sign/sign.hpp"
-#include "rr.hpp"
-#include "rrset.hpp"
-#include "wire_format.hpp"
-#include "string_commons.hpp"
-#include "dnssec_keys.hpp"
+#include "crypto/sign.hpp"
+#include "dns/rr.hpp"
+#include "dns/rrset.hpp"
+#include "dns/wire_format.hpp"
+#include "dns/dnssec_keys.hpp"
+#include "commons/string_commons.hpp"
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -75,7 +75,7 @@ namespace crypto {
         fclose(fp);
     }
     
-    dns::DNSResourceRecord DNSSECSigner::signRRSet(const dns::DNSResourceRecordSet& rrset, uint32_t sig_validity_days = 30) {
+    dns::DNSResourceRecord DNSSECSigner::signRRSet(dns::DNSResourceRecordSet& rrset, uint32_t sig_validity_days = 30) {
         EVP_PKEY* key = (rrset.type == dns::RR_TYPE_DNSKEY) ? ksk : zsk;
         dns::dnssec_key_t key_type = (rrset.type == dns::RR_TYPE_DNSKEY) ? dns::DNSSEC_KSK : dns::DNSSEC_ZSK;
         std::sort(rrset.records.begin(), rrset.records.end(),

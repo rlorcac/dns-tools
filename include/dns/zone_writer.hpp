@@ -5,9 +5,9 @@
 #ifndef DNS_ZONE_WRITER_HPP // DNS_ZONE_WRITER_HPP
 #define DNS_ZONE_WRITER_HPP
 
-#include "rr.hpp"
-#include "wire_format.hpp"
-#include "string_commons.hpp"
+#include "commons/string_commons.hpp"
+#include "dns/rr.hpp"
+#include "dns/wire_format.hpp"
 
 namespace dns {
 

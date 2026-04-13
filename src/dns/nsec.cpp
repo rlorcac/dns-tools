@@ -1,6 +1,6 @@
-#include "nsec.hpp"
-#include "rr.hpp"
-#include "string_commons.hpp"
+#include "commons/string_commons.hpp"
+#include "dns/nsec.hpp"
+#include "dns/rr.hpp"
 #include <set>
 #include <algorithm>
 #include <vector>

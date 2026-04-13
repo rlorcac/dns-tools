@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <sstream>
 #include <stdexcept>
-#include "wire_format.hpp"
+#include "dns/wire_format.hpp"
 
 namespace dns {
 

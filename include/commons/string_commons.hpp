@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <stdexcept>
+#include <cstdint>
 
 #ifndef COMMONS_STRING_COMMONS_HPP // COMMONS_STRING_COMMONS_HPP
 #define COMMONS_STRING_COMMONS_HPP

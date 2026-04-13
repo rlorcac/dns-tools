@@ -12,9 +12,9 @@
 #ifndef DNS_ZONE_PARSER_HPP // DNS_ZONE_PARSER_HPP
 #define DNS_ZONE_PARSER_HPP
 
-#include "string_commons.hpp"
-#include "wire_format.hpp"
-#include "rr.hpp"
+#include "commons/string_commons.hpp"
+#include "dns/wire_format.hpp"
+#include "dns/rr.hpp"
 
 
 namespace dns {

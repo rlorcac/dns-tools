@@ -1,5 +1,5 @@
-#include "verify/verify_command.hpp"
-#include "context.hpp"
+#include "cli/verify_command.hpp"
+#include "context/context.hpp"
 #include <CLI/App.hpp>
 
 CLI::App *register_verify(CLI::App &app) {

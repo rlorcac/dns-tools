@@ -22,7 +22,7 @@ find_package(OpenSSL REQUIRED)
     target_include_directories(
         dns-tools-commons
             PUBLIC
-                src/commons
+                include
     )
 
 # DNS library
@@ -39,8 +39,7 @@ find_package(OpenSSL REQUIRED)
     target_include_directories(
         dns-tools-dns
             PUBLIC
-                src/dns
-                src/commons
+                include
     )
 
     target_link_libraries(
@@ -52,17 +51,15 @@ find_package(OpenSSL REQUIRED)
 # Crypto library
     add_library(
         dns-tools-crypto
-            src/crypto/hash/digest.cpp
-            src/crypto/sign/sign.cpp
-            src/crypto/verify/verify.cpp
+            src/crypto/digest.cpp
+            src/crypto/sign.cpp
+            src/crypto/verify.cpp
     )
 
     target_include_directories(
         dns-tools-crypto
             PUBLIC
-                src/crypto
-                src/dns
-                src/commons
+                include
     )
 
     target_link_libraries(
@@ -82,7 +79,7 @@ find_package(OpenSSL REQUIRED)
     target_include_directories(
         dns-tools-context
             PUBLIC
-                src/context
+                include
     )
 
     target_link_libraries(
@@ -94,22 +91,19 @@ find_package(OpenSSL REQUIRED)
 # CLI library
     add_library(
         dns-tools-cli
-            src/cli/sign/sign_command.cpp
-            src/cli/verify/verify_command.cpp
-            src/cli/digest/digest_command.cpp
+            src/cli/sign_command.cpp
+            src/cli/verify_command.cpp
+            src/cli/digest_command.cpp
             src/context/context.cpp
-            src/crypto/hash/digest.cpp
-            src/crypto/sign/sign.cpp
-            src/crypto/verify/verify.cpp
+            src/crypto/digest.cpp
+            src/crypto/sign.cpp
+            src/crypto/verify.cpp
     )
 
     target_include_directories(
         dns-tools-cli
             PUBLIC
-                src/cli
-                src/context
-                src/crypto
-                src/dns
+                include
     )
     
     target_link_libraries(

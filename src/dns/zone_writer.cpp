@@ -2,10 +2,10 @@
 #include <vector>
 #include <fstream>
 
-#include "rr.hpp"
-#include "wire_format.hpp"
-#include "zone_writer.hpp"
-#include "string_commons.hpp"
+#include "commons/string_commons.hpp"
+#include "dns/rr.hpp"
+#include "dns/wire_format.hpp"
+#include "dns/zone_writer.hpp"
 
 namespace dns {
 

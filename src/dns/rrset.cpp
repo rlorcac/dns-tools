@@ -1,11 +1,12 @@
-#include "wire_format.hpp"
-#include "rr.hpp"
-#include "rrset.hpp"
-#include "string_commons.hpp"
+#include "commons/string_commons.hpp"
+#include "dns/wire_format.hpp"
+#include "dns/rr.hpp"
+#include "dns/rrset.hpp"
 #include <vector>
 #include <map>
 #include <tuple>
 #include <algorithm>
+#include <cstdint>
 
 namespace dns {
     std::vector<DNSResourceRecordSet> groupIntoRRsets(const std::vector<DNSResourceRecord>& records) {
@@ -44,7 +45,7 @@ namespace dns {
         // RFC 4034 Section 3.1.8.1
         for (const auto& rr : rrset.records) {
             // Encode owner name (canonical lowercase)
-            auto name_wire = commons::encodeDomainName(commons::toLower(rrset.name));
+            std::vector<uint8_t> name_wire = commons::encodeDomainName(commons::toLower(rrset.name));
             wire.insert(wire.end(), name_wire.begin(), name_wire.end());
             
             // Type, class, TTL (use RRset's TTL, not individual RR's TTL)

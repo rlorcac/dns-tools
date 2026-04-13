@@ -1,8 +1,8 @@
-#include "sign/sign_command.hpp"
-#include "sign/sign.hpp"
-#include "zone_parser.hpp"
-#include "zone_writer.hpp"
-#include "context.hpp"
+#include "cli/sign_command.hpp"
+#include "crypto/sign.hpp"
+#include "dns/zone_parser.hpp"
+#include "dns/zone_writer.hpp"
+#include "context/context.hpp"
 #include <CLI/CLI.hpp>
 #include <CLI/Formatter.hpp>
 

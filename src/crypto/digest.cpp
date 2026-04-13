@@ -1,4 +1,4 @@
-#include "hash/digest.hpp"
+#include "crypto/digest.hpp"
 #include <unordered_map>
 #include <string>
 

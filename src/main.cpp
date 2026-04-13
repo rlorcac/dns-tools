@@ -1,8 +1,8 @@
 #include <iostream>
 #include <CLI/CLI.hpp>
-#include "sign/sign_command.hpp"
-#include "verify/verify_command.hpp"
-#include "digest/digest_command.hpp"
+#include "cli/sign_command.hpp"
+#include "cli/verify_command.hpp"
+#include "cli/digest_command.hpp"
 
 int main(int argc, char* argv[]){
     CLI::App dns_tools{"Allows signing of a DNS zone using a PKCS#11 device.\n\nFor more information, visit \"https://github.com/niclabs/dns-tools\"."};
